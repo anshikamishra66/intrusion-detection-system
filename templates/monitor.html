@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Live IDS Monitor{% endblock %}
+
+{% block content %}
+    <section class="hero compact-hero">
+        <div>
+            <p class="eyebrow">Defense Surface</p>
+            <h1>Hybrid IDS Monitor</h1>
+            <p class="hero-copy">
+                Launch live brute-force or DDoS simulations, watch the detection engine classify traffic using rules and a dataset-trained model,
+                and present the mitigation response in real time.
+            </p>
+        </div>
+        <div class="threat-meter-wrap">
+            <span class="meter-label">Threat Level</span>
+            <div class="threat-meter">
+                <div class="threat-meter-fill" id="threatMeterFill" style="width: {{ ids.metrics.threat_level }}%;"></div>
+            </div>
+            <span class="meter-value" id="threatMeterValue">{{ ids.metrics.threat_level }}%</span>
+        </div>
+    </section>
+
+    <section class="metric-grid">
+        <article class="metric-card">
+            <span class="metric-label">Active Threats</span>
+            <strong id="metricActiveThreats">{{ ids.metrics.active_threats }}</strong>
+        </article>
+        <article class="metric-card">
+            <span class="metric-label">Blocked IPs</span>
+            <strong id="metricBlockedIps">{{ ids.metrics.blocked_ips }}</strong>
+        </article>
+        <article class="metric-card">
+            <span class="metric-label">Rate Limited</span>
+            <strong id="metricRateLimited">{{ ids.metrics.rate_limited }}</strong>
+        </article>
+        <article class="metric-card">
+            <span class="metric-label">Req / Sec</span>
+            <strong id="metricRequestRate">{{ ids.metrics.request_rate }}</strong>
+        </article>
+        <article class="metric-card">
+            <span class="metric-label">Failed Logins</span>
+            <strong id="metricFailedLogins">{{ ids.metrics.failed_logins }}</strong>
+        </article>
+        <article class="metric-card">
+            <span class="metric-label">Storage Mode</span>
+            <strong id="metricStorageMode">{{ storage_status.mode|upper }}</strong>
+        </article>
+    </section>
+
+    <section class="page-grid two-col">
+        <article class="panel ids-panel">
+            <section class="card control-card">
+                <div class="control-copy">
+                    <h3>Attack Controls</h3>
+                    <p>These buttons work as normal HTML forms, so the demo stays usable even if JavaScript has issues in the browser.</p>
+                </div>
+                <div class="button-row">
+                    <form class="action-form" method="post" action="{{ url_for('simulate_action', profile='bruteforce') }}">
+                        <button class="button button-alert" type="submit">Brute Force</button>
+                    </form>
+                    <form class="action-form" method="post" action="{{ url_for('simulate_action', profile='ddos') }}">
+                        <button class="button button-alert" type="submit">DDoS</button>
+                    </form>
+                    <form class="action-form" method="post" action="{{ url_for('simulate_action', profile='both') }}">
+                        <button class="button button-danger" type="submit">Coordinated Attack</button>
+                    </form>
+                    <form class="action-form" method="post" action="{{ url_for('reset_demo_action') }}">
+                        <button class="button button-secondary" type="submit">Reset Demo</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="chart-grid">
+                <article class="card chart-card">
+                    <div class="card-heading">
+                        <h3>Traffic Timeline</h3>
+                        <span>Normal vs suspicious request bursts</span>
+                    </div>
+                    <canvas id="trafficChart" width="720" height="260"></canvas>
+                </article>
+
+                <article class="card chart-card">
+                    <div class="card-heading">
+                        <h3>Attack Breakdown</h3>
+                        <span>Brute-force, credential-stuffing, DDoS, and anomaly share</span>
+                    </div>
+                    <div id="distributionBars" class="distribution-bars"></div>
+                </article>
+            </section>
+
+            <section class="card table-card">
+                <div class="table-header">
+                    <div>
+                        <h3>Live Event Stream</h3>
+                        <span>Requests flowing through the IDS engine</span>
+                    </div>
+                    <div class="filter-row">
+                        <button type="button" class="filter-chip active" data-filter="all">All</button>
+                        <button type="button" class="filter-chip" data-filter="threat">Threat</button>
+                        <button type="button" class="filter-chip" data-filter="warning">Warning</button>
+                        <button type="button" class="filter-chip" data-filter="safe">Safe</button>
+                    </div>
+                </div>
+                <div class="event-table" id="eventTable"></div>
+            </section>
+        </article>
+
+        <article class="panel victim-panel">
+            <section class="card">
+                <div class="card-heading">
+                    <div>
+                        <p class="panel-kicker">Active Mitigation</p>
+                        <h3 id="mitigationHeadline">Monitoring</h3>
+                    </div>
+                </div>
+                <p id="mitigationDetail">No active blocks yet.</p>
+            </section>
+
+            <section class="card terminal-card">
+                <div class="card-heading">
+                    <h3>Engine Terminal</h3>
+                    <span>Live analyst-friendly commentary</span>
+                </div>
+                <div id="terminalFeed" class="terminal-feed"></div>
+            </section>
+
+            <section class="card offender-card">
+                <div class="card-heading">
+                    <h3>Top Offenders</h3>
+                    <span>Most aggressive attacking sources</span>
+                </div>
+                <div id="offenderList" class="offender-list"></div>
+            </section>
+
+            <section class="card">
+                <div class="card-heading">
+                    <div>
+                        <p class="panel-kicker">Related Views</p>
+                        <h3>Open Other Pages</h3>
+                    </div>
+                </div>
+                <div class="button-row">
+                    <a class="button button-primary" href="{{ url_for('todo_page') }}">Todo Site</a>
+                    <a class="button button-secondary" href="{{ url_for('reports_page') }}">Threat Report</a>
+                    <a class="button button-secondary" href="{{ url_for('lab_page') }}">Split-Screen Lab</a>
+                </div>
+            </section>
+        </article>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/monitor.js') }}"></script>
+{% endblock %}

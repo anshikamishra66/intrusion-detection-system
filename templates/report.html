@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Threat Analysis Report{% endblock %}
+
+{% block content %}
+    <section class="hero compact-hero">
+        <div>
+            <p class="eyebrow">Executive Threat Report</p>
+            <h1>Current Security Analysis</h1>
+            <p class="hero-copy">
+                This report summarizes the live detection posture of the Todo platform, the active mitigations in place,
+                and the hybrid methodology used to classify DDoS and brute-force activity.
+            </p>
+        </div>
+        <div class="hero-badges">
+            <span class="badge badge-neutral">Threat Level {{ ids.metrics.threat_level }}%</span>
+            <span class="badge badge-neutral">Hybrid Rule + ML</span>
+            <span class="badge badge-neutral">{{ storage_status.mode|upper }}</span>
+        </div>
+    </section>
+
+    <section class="card-grid">
+        <article class="card">
+            <p class="panel-kicker">Executive Summary</p>
+            <h3>Key Findings</h3>
+            <div class="flow-list">
+                {% for line in summary_lines %}
+                    <div class="flow-item">{{ line }}</div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="card">
+            <p class="panel-kicker">Detection Method</p>
+            <h3>Why This Is Hybrid</h3>
+            <div class="flow-list">
+                <div class="flow-item">Rule thresholds catch obvious brute-force and DDoS patterns quickly.</div>
+                <div class="flow-item">A dataset-driven classifier scores request behavior and supports anomaly identification.</div>
+                <div class="flow-item">Mitigations are escalated from monitoring to rate limiting to blocking based on severity.</div>
+            </div>
+        </article>
+
+        <article class="card">
+            <p class="panel-kicker">Presentation Tip</p>
+            <h3>What To Show</h3>
+            <div class="flow-list">
+                <div class="flow-item">Show the Todo app working first.</div>
+                <div class="flow-item">Trigger an attack on the monitor page.</div>
+                <div class="flow-item">Return to the Todo page and explain that the application is still available for legitimate users.</div>
+            </div>
+        </article>
+    </section>
+
+    <section class="page-grid two-col">
+        <article class="panel ids-panel">
+            <section class="card">
+                <div class="card-heading">
+                    <h3>Active Mitigations</h3>
+                    <span>Current response actions</span>
+                </div>
+                <div class="flow-list">
+                    {% if ids.mitigations %}
+                        {% for item in ids.mitigations %}
+                            <div class="flow-item">
+                                {{ item.ip }} is {{ item.mode|replace('_', ' ')|upper }} for {{ item.reason|replace('_', ' ') }}
+                                with {{ item.expires_in }} seconds remaining.
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="flow-item">No active mitigations at the moment.</div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-heading">
+                    <h3>Recent Alerts</h3>
+                    <span>Most recent security alerts</span>
+                </div>
+                <div class="flow-list">
+                    {% if ids.recent_alerts %}
+                        {% for alert in ids.recent_alerts %}
+                            <div class="flow-item">
+                                [{{ alert.time_label }}] {{ alert.attack_type|replace('_', ' ')|title }} from {{ alert.ip }}
+                                was marked {{ alert.severity }} and action {{ alert.action }}.
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="flow-item">No recent alerts have been generated yet.</div>
+                    {% endif %}
+                </div>
+            </section>
+        </article>
+
+        <article class="panel victim-panel">
+            <section class="card">
+                <div class="card-heading">
+                    <h3>Top Offender IPs</h3>
+                    <span>Highest-volume suspicious sources</span>
+                </div>
+                <div class="flow-list">
+                    {% if ids.top_offenders %}
+                        {% for offender in ids.top_offenders %}
+                            <div class="flow-item">
+                                {{ offender.ip }} from {{ offender.country }} generated {{ offender.hits }} suspicious hits
+                                and is associated with {{ offender.last_attack_type|replace('_', ' ')|title }}.
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="flow-item">No offender IPs have crossed alert thresholds yet.</div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-heading">
+                    <h3>Dataset And Model</h3>
+                    <span>Training data used by the IDS engine</span>
+                </div>
+                <div class="flow-list">
+                    <div class="flow-item">The model reads a CSV training dataset from the local `data` folder.</div>
+                    <div class="flow-item">Features include request rate, failed logins, endpoint spread, interval timing, and error ratios.</div>
+                    <div class="flow-item">This lets you explain that the project is not only rule-based but also data-driven.</div>
+                </div>
+            </section>
+        </article>
+    </section>
+{% endblock %}

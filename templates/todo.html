@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Todo Website{% endblock %}
+
+{% block content %}
+    <section class="hero compact-hero">
+        <div>
+            <p class="eyebrow">Victim Application</p>
+            <h1>Northstar Tasks</h1>
+            <p class="hero-copy">
+                This is the actual Todo website that your IDS protects. Normal user activity here is logged as safe traffic,
+                while attack traffic against the same backend is detected and mitigated in the monitor.
+            </p>
+        </div>
+        <div class="hero-badges">
+            <span class="badge badge-neutral">Demo User: {{ demo_credentials.username }}</span>
+            <span class="badge badge-neutral">Password: {{ demo_credentials.password }}</span>
+            <a class="button button-alert" href="{{ url_for('monitor_page') }}">Watch Live Monitor</a>
+        </div>
+    </section>
+
+    <section class="page-grid two-col">
+        <article class="panel victim-panel">
+            {% if session_payload.authenticated %}
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-kicker">Signed In</p>
+                        <h2>{{ session_payload.username }} Workspace</h2>
+                    </div>
+                    <form method="post" action="{{ url_for('logout') }}">
+                        <button class="button button-secondary" type="submit">Logout</button>
+                    </form>
+                </div>
+
+                <section class="metric-grid">
+                    <article class="metric-card">
+                        <span class="metric-label">Total Tasks</span>
+                        <strong>{{ stats.total }}</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Completed</span>
+                        <strong>{{ stats.completed }}</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Pending</span>
+                        <strong>{{ stats.pending }}</strong>
+                    </article>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <div>
+                            <p class="panel-kicker">Create Task</p>
+                            <h3>Add a Todo Item</h3>
+                        </div>
+                    </div>
+                    <form class="todo-form" method="post" action="{{ url_for('create_todo_form') }}">
+                        <input name="task" type="text" placeholder="Prepare final presentation screenshots" required>
+                        <button class="button button-primary" type="submit">Add Task</button>
+                    </form>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <div>
+                            <p class="panel-kicker">Task Board</p>
+                            <h3>Live Task List</h3>
+                        </div>
+                    </div>
+
+                    <div class="todo-list">
+                        {% if todos %}
+                            {% for todo in todos %}
+                                <article class="todo-item todo-item-form {% if todo.completed %}done{% endif %}">
+                                    <div>
+                                        <div class="todo-text">{{ todo.task }}</div>
+                                        <div class="muted">{{ todo.created_at }}</div>
+                                    </div>
+                                    <div class="todo-actions">
+                                        <form method="post" action="{{ url_for('toggle_todo_form', todo_id=todo.id) }}">
+                                            <input type="hidden" name="completed" value="{% if todo.completed %}0{% else %}1{% endif %}">
+                                            <button class="mini-button" type="submit">{% if todo.completed %}Mark Pending{% else %}Mark Done{% endif %}</button>
+                                        </form>
+                                        <form method="post" action="{{ url_for('delete_todo_form', todo_id=todo.id) }}">
+                                            <button class="mini-button" type="submit">Delete</button>
+                                        </form>
+                                    </div>
+                                </article>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">No tasks yet. Add your first task and it will appear here.</div>
+                        {% endif %}
+                    </div>
+                </section>
+            {% else %}
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-kicker">Operator Access</p>
+                        <h2>Login or Register</h2>
+                    </div>
+                </div>
+
+                <section class="card">
+                    <div class="demo-card">
+                        <p class="demo-title">Built-in Demo Account</p>
+                        <p><strong>{{ demo_credentials.username }}</strong> / <strong>{{ demo_credentials.password }}</strong></p>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <div>
+                            <p class="panel-kicker">Login</p>
+                            <h3>Open the Todo Workspace</h3>
+                        </div>
+                    </div>
+                    <form class="stack-form" method="post" action="{{ url_for('login') }}">
+                        <label>
+                            Username
+                            <input type="text" name="username" placeholder="analyst" required>
+                        </label>
+                        <label>
+                            Password
+                            <input type="password" name="password" placeholder="Defend123!" required>
+                        </label>
+                        <button class="button button-primary" type="submit">Login</button>
+                    </form>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <div>
+                            <p class="panel-kicker">Register</p>
+                            <h3>Create a New Todo User</h3>
+                        </div>
+                    </div>
+                    <form class="stack-form" method="post" action="{{ url_for('register') }}">
+                        <label>
+                            Username
+                            <input type="text" name="username" placeholder="newuser" required>
+                        </label>
+                        <label>
+                            Password
+                            <input type="password" name="password" placeholder="minimum 6 characters" required>
+                        </label>
+                        <button class="button button-secondary" type="submit">Register</button>
+                    </form>
+                </section>
+            {% endif %}
+        </article>
+
+        <article class="panel ids-panel">
+            <div class="panel-header">
+                <div>
+                    <p class="panel-kicker">Protected By</p>
+                    <h2>Hybrid IDS Coverage</h2>
+                </div>
+            </div>
+
+            <section class="card">
+                <div class="flow-list">
+                    <div class="flow-item">Successful logins and Todo actions become normal behavioral traffic.</div>
+                    <div class="flow-item">Repeated failed logins are tracked per source IP for brute-force detection.</div>
+                    <div class="flow-item">Request bursts against public endpoints feed the DDoS detector and mitigation engine.</div>
+                    <div class="flow-item">The monitor page shows blocked IPs, event streams, top offenders, and ML-assisted classification.</div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-heading">
+                    <div>
+                        <p class="panel-kicker">Suggested Demo Flow</p>
+                        <h3>How To Present It</h3>
+                    </div>
+                </div>
+                <div class="flow-list">
+                    <div class="flow-item">1. Login using the demo account and create 2 to 3 tasks.</div>
+                    <div class="flow-item">2. Open the Live Monitor in another tab.</div>
+                    <div class="flow-item">3. Trigger Brute Force or DDoS and show detection in real time.</div>
+                    <div class="flow-item">4. Return here to prove legitimate users still have a working application.</div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-heading">
+                    <div>
+                        <p class="panel-kicker">Navigation</p>
+                        <h3>Open the Other Views</h3>
+                    </div>
+                </div>
+                <div class="button-row">
+                    <a class="button button-alert" href="{{ url_for('monitor_page') }}">Live Monitor</a>
+                    <a class="button button-secondary" href="{{ url_for('reports_page') }}">Threat Report</a>
+                    <a class="button button-secondary" href="{{ url_for('lab_page') }}">Split-Screen Lab</a>
+                </div>
+            </section>
+        </article>
+    </section>
+{% endblock %}

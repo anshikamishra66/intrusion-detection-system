@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Hybrid IDS Platform{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div class="noise-grid"></div>
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+
+    <main class="page-shell">
+        <header class="topbar">
+            <a class="brand-mark" href="{{ url_for('home_page') }}">
+                <span class="brand-dot"></span>
+                <div>
+                    <strong>Sentinel Canvas</strong>
+                    <span>Hybrid IDS + Todo Defense Lab</span>
+                </div>
+            </a>
+
+            <nav class="nav-links">
+                <a class="nav-link{% if request.path == '/' %} active{% endif %}" href="{{ url_for('home_page') }}">Home</a>
+                <a class="nav-link{% if request.path.startswith('/todo') %} active{% endif %}" href="{{ url_for('todo_page') }}">Todo Site</a>
+                <a class="nav-link{% if request.path.startswith('/monitor') %} active{% endif %}" href="{{ url_for('monitor_page') }}">Live Monitor</a>
+                <a class="nav-link{% if request.path.startswith('/reports') %} active{% endif %}" href="{{ url_for('reports_page') }}">Reports</a>
+                <a class="nav-link{% if request.path.startswith('/lab') %} active{% endif %}" href="{{ url_for('lab_page') }}">Split Lab</a>
+            </nav>
+
+            <div class="topbar-meta">
+                <span class="badge badge-neutral">{{ storage_status.mode|upper }}</span>
+                {% if session_payload and session_payload.authenticated %}
+                    <span class="session-pill">{{ session_payload.username }}</span>
+                {% else %}
+                    <span class="session-pill">Guest</span>
+                {% endif %}
+            </div>
+        </header>
+
+        {% with flashes = get_flashed_messages(with_categories=true) %}
+            {% if flashes %}
+                <section class="flash-stack">
+                    {% for category, message in flashes %}
+                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

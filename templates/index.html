@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hybrid IDS Todo Monitor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="noise-grid"></div>
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+
+    <main class="page-shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Hybrid Intelligence Monitoring Lab</p>
+                <h1>Todo Website Under Attack. IDS Responding Live.</h1>
+                <p class="hero-copy">
+                    A split-screen demo where a working Todo app is attacked by brute-force and DDoS traffic,
+                    while the IDS detects, scores, and mitigates the activity in real time.
+                </p>
+            </div>
+            <div class="hero-badges">
+                <span class="badge badge-neutral" id="storageModeBadge">{{ storage_status.mode|upper }}</span>
+                <span class="badge badge-neutral">Rule + ML Hybrid</span>
+                <span class="badge badge-neutral">Supabase Ready</span>
+            </div>
+        </header>
+
+        <div class="status-banner" id="statusBanner">Live workspace initialized.</div>
+
+        <section class="workspace-grid">
+            <section class="panel victim-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-kicker">Victim Surface</p>
+                        <h2>Northstar Tasks</h2>
+                    </div>
+                    <span class="session-pill" id="sessionBadge">Guest session</span>
+                </div>
+
+                <section class="card intro-card">
+                    <div class="intro-copy">
+                        <h3>Operator Access</h3>
+                        <p>Use the built-in demo account or register a fresh one. Safe traffic from this panel is logged right beside the IDS feed.</p>
+                    </div>
+                    <div class="demo-card">
+                        <p class="demo-title">Demo Account</p>
+                        <p><strong>{{ demo_credentials.username }}</strong> / <strong>{{ demo_credentials.password }}</strong></p>
+                    </div>
+                </section>
+
+                <section class="card auth-card" id="authCard">
+                    <h3>Login or Register</h3>
+                    <form id="authForm" class="stack-form">
+                        <label>
+                            Username
+                            <input type="text" id="usernameInput" placeholder="analyst">
+                        </label>
+                        <label>
+                            Password
+                            <input type="password" id="passwordInput" placeholder="Defend123!">
+                        </label>
+                        <div class="button-row">
+                            <button type="button" class="button button-primary" id="loginButton">Login</button>
+                            <button type="button" class="button button-secondary" id="registerButton">Register</button>
+                        </div>
+                    </form>
+                </section>
+
+                <section class="card todo-card hidden" id="todoCard">
+                    <div class="todo-toolbar">
+                        <div>
+                            <h3>Your Todo Board</h3>
+                            <p id="todoSummary">0 tasks tracked.</p>
+                        </div>
+                        <button type="button" class="button button-secondary" id="logoutButton">Logout</button>
+                    </div>
+
+                    <form id="todoForm" class="todo-form">
+                        <input type="text" id="todoInput" placeholder="Add a task for the live demo">
+                        <button type="submit" class="button button-primary">Add Task</button>
+                    </form>
+
+                    <div id="todoList" class="todo-list"></div>
+                </section>
+
+                <section class="card feed-card">
+                    <div class="panel-split">
+                        <div>
+                            <p class="panel-kicker">Database</p>
+                            <h3 id="storageHeadline">Supabase / Local Fallback</h3>
+                            <p id="storageDetail">{{ storage_status.detail }}</p>
+                        </div>
+                        <div>
+                            <p class="panel-kicker">Mitigation State</p>
+                            <h3 id="mitigationHeadline">Monitoring</h3>
+                            <p id="mitigationDetail">No active blocks yet.</p>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <section class="panel ids-panel">
+                <div class="panel-header">
+                    <div>
+                        <p class="panel-kicker">Defense Surface</p>
+                        <h2>Hybrid IDS Monitor</h2>
+                    </div>
+                    <div class="threat-meter-wrap">
+                        <span class="meter-label">Threat Level</span>
+                        <div class="threat-meter">
+                            <div class="threat-meter-fill" id="threatMeterFill"></div>
+                        </div>
+                        <span class="meter-value" id="threatMeterValue">0%</span>
+                    </div>
+                </div>
+
+                <section class="metric-grid">
+                    <article class="metric-card">
+                        <span class="metric-label">Active Threats</span>
+                        <strong id="metricActiveThreats">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Blocked IPs</span>
+                        <strong id="metricBlockedIps">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Rate Limited</span>
+                        <strong id="metricRateLimited">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Req / Sec</span>
+                        <strong id="metricRequestRate">0.0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Failed Logins</span>
+                        <strong id="metricFailedLogins">0</strong>
+                    </article>
+                    <article class="metric-card">
+                        <span class="metric-label">Storage Mode</span>
+                        <strong id="metricStorageMode">LOCAL</strong>
+                    </article>
+                </section>
+
+                <section class="card control-card">
+                    <div class="control-copy">
+                        <h3>Attack Controls</h3>
+                        <p>Trigger a live brute-force spray, a DDoS burst, or both at once to demonstrate detection and mitigation.</p>
+                    </div>
+                    <div class="button-row">
+                        <button type="button" class="button button-alert" data-attack="bruteforce">Brute Force</button>
+                        <button type="button" class="button button-alert" data-attack="ddos">DDoS</button>
+                        <button type="button" class="button button-danger" data-attack="both">Coordinated Attack</button>
+                        <button type="button" class="button button-secondary" id="resetDemoButton">Reset Demo</button>
+                    </div>
+                </section>
+
+                <section class="chart-grid">
+                    <article class="card chart-card">
+                        <div class="card-heading">
+                            <h3>Traffic Timeline</h3>
+                            <span>Normal vs suspicious request bursts</span>
+                        </div>
+                        <canvas id="trafficChart" width="720" height="260"></canvas>
+                    </article>
+
+                    <article class="card chart-card">
+                        <div class="card-heading">
+                            <h3>Attack Breakdown</h3>
+                            <span>Distribution of detected attack classes</span>
+                        </div>
+                        <div id="distributionBars" class="distribution-bars"></div>
+                    </article>
+                </section>
+
+                <section class="stream-grid">
+                    <article class="card terminal-card">
+                        <div class="card-heading">
+                            <h3>Engine Terminal</h3>
+                            <span>Live IDS commentary</span>
+                        </div>
+                        <div id="terminalFeed" class="terminal-feed"></div>
+                    </article>
+
+                    <article class="card offender-card">
+                        <div class="card-heading">
+                            <h3>Top Offenders</h3>
+                            <span>Most aggressive source IPs</span>
+                        </div>
+                        <div id="offenderList" class="offender-list"></div>
+                    </article>
+                </section>
+
+                <section class="card table-card">
+                    <div class="table-header">
+                        <div>
+                            <h3>Live Event Stream</h3>
+                            <span>Safe, warning, and threat telemetry</span>
+                        </div>
+                        <div class="filter-row">
+                            <button type="button" class="filter-chip active" data-filter="all">All</button>
+                            <button type="button" class="filter-chip" data-filter="threat">Threat</button>
+                            <button type="button" class="filter-chip" data-filter="warning">Warning</button>
+                            <button type="button" class="filter-chip" data-filter="safe">Safe</button>
+                        </div>
+                    </div>
+                    <div class="event-table" id="eventTable"></div>
+                </section>
+            </section>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
